@@ -76,7 +76,7 @@ export default function Home() {
       const apiData = await fetchSEOData(businessName, businessAddress);
       
       // Calculate base scores
-      let score = {
+      const score = {
         nameLength: 0,
         addressCompleteness: 0,
         keywordOptimization: 0,
@@ -135,7 +135,7 @@ export default function Home() {
         socialMedia: apiData.socialMedia,
         reviews: apiData.reviews
       };
-    } catch (err) {
+    } catch (_error) {
       throw new Error('Failed to fetch SEO data');
     }
   };
@@ -296,7 +296,7 @@ export default function Home() {
                     <p className="mt-2 text-sm text-gray-500">
                       Include full address: Street, City, State, ZIP, Country
                     </p>
-        </div>
+                  </div>
 
                   {/* Calculate Button */}
                   <button
