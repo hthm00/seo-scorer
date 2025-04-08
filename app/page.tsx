@@ -40,8 +40,11 @@ interface Recommendation {
 
 interface SocialMediaData {
   exists: boolean;
-  followers: number;
+  followers?: number;
 }
+
+const socialPlatforms = ['facebook', 'instagram', 'twitter', 'linkedin'] as const;
+type SocialPlatform = typeof socialPlatforms[number];
 
 interface SocialMediaPlatforms {
   facebook: SocialMediaData;
@@ -130,8 +133,6 @@ export default function Home() {
       score.googleRanking = Math.max(0, 100 - apiData.searchRanking.googlePosition);
 
       // Social media presence score
-      const socialPlatforms = ['facebook', 'instagram', 'twitter', 'linkedin'] as const;
-      type SocialPlatform = typeof socialPlatforms[number];
       const existingPlatforms = socialPlatforms.filter((platform: SocialPlatform) =>
         apiData.socialMedia[platform].exists
       ).length;
@@ -196,11 +197,13 @@ export default function Home() {
     }
 
     // Review Management Recommendations
-    if (score.reviews.google.count < 100 || score.reviews.yelp.count < 50) {
+    const googleCount = score.reviews?.google?.count ?? 0;
+    const yelpCount = score.reviews?.yelp?.count ?? 0;
+    if (googleCount < 100 || yelpCount < 50) {
       recs.push({
         category: 'Online Reviews',
         status: 'warning',
-        message: `Current reviews: Google (${score.reviews.google.count}), Yelp (${score.reviews.yelp.count})`,
+        message: `Current reviews: Google (${googleCount}), Yelp (${yelpCount})`,
         improvement: 'Encourage satisfied customers to leave reviews and respond to existing reviews',
         priority: 'high'
       });
@@ -524,7 +527,7 @@ export default function Home() {
               <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
                 <h2 className="text-xl font-semibold mb-4">Social Media Presence</h2>
                 <div className="grid grid-cols-2 gap-4">
-                  {Object.entries(seoScore.socialMedia).map(([platform, data]: [SocialPlatform, SocialMediaData]) => (
+                  {Object.entries(seoScore.socialMedia).map(([platform, data]) => (
                     <div key={platform} className="p-4 bg-gray-50 rounded-lg">
                       <h3 className="font-medium mb-2 capitalize">{platform}</h3>
                       {data.exists ? (
