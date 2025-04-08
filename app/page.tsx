@@ -39,7 +39,7 @@ interface Recommendation {
 }
 
 // Simulated API call - replace with actual SEO API integration
-const fetchSEOData = async (businessName: string, businessAddress: string) => {
+const fetchSEOData = async (_businessName: string, _businessAddress: string) => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -64,8 +64,8 @@ const fetchSEOData = async (businessName: string, businessAddress: string) => {
 };
 
 export default function Home() {
-  const [businessName, setBusinessName] = useState('');
-  const [businessAddress, setBusinessAddress] = useState('');
+  const [_businessName, setBusinessName] = useState('');
+  const [_businessAddress, setBusinessAddress] = useState('');
   const [seoScore, setSeoScore] = useState<SeoScore | null>(null);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [isCalculating, setIsCalculating] = useState(false);
@@ -73,7 +73,7 @@ export default function Home() {
 
   const calculateSEOMetrics = async () => {
     try {
-      const apiData = await fetchSEOData(businessName, businessAddress);
+      const apiData = await fetchSEOData(_businessName, _businessAddress);
       
       // Calculate base scores
       const score = {
@@ -87,17 +87,17 @@ export default function Home() {
       };
 
       // Basic name and address scoring
-      if (businessName.length > 0) {
-        score.nameLength = businessName.length >= 15 && businessName.length <= 30 ? 30 :
-          businessName.length < 15 ? Math.round((businessName.length / 15) * 30) :
-          Math.round((40 / businessName.length) * 30);
+      if (_businessName.length > 0) {
+        score.nameLength = _businessName.length >= 15 && _businessName.length <= 30 ? 30 :
+          _businessName.length < 15 ? Math.round((_businessName.length / 15) * 30) :
+          Math.round((40 / _businessName.length) * 30);
         
-        const keywords = businessName.toLowerCase().split(' ');
+        const keywords = _businessName.toLowerCase().split(' ');
         score.keywordOptimization = Math.min(keywords.length * 10, 30);
       }
 
-      if (businessAddress.length > 0) {
-        const addressParts = businessAddress.split(',').length;
+      if (_businessAddress.length > 0) {
+        const addressParts = _businessAddress.split(',').length;
         score.addressCompleteness = Math.min(addressParts * 10, 40);
       }
 
@@ -194,7 +194,7 @@ export default function Home() {
       const newScore = await calculateSEOMetrics();
       setSeoScore(newScore);
       setRecommendations(generateRecommendations(newScore));
-    } catch (err) {
+    } catch (_error) {
       setError('Failed to calculate SEO score. Please try again.');
     } finally {
       setIsCalculating(false);
@@ -249,7 +249,7 @@ export default function Home() {
                       <input
                         type="text"
                         id="businessName"
-                        value={businessName}
+                        value={_businessName}
                         onChange={(e) => setBusinessName(e.target.value)}
                         className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-gray-900 placeholder-gray-400"
                         placeholder="Enter your business name"
@@ -286,7 +286,7 @@ export default function Home() {
                       </div>
                       <textarea
                         id="businessAddress"
-                        value={businessAddress}
+                        value={_businessAddress}
                         onChange={(e) => setBusinessAddress(e.target.value)}
                         className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-gray-900 placeholder-gray-400 resize-none"
                         placeholder="Enter your business address"
@@ -301,9 +301,9 @@ export default function Home() {
                   {/* Calculate Button */}
                   <button
                     onClick={calculateSeoScore}
-                    disabled={isCalculating || !businessName || !businessAddress}
+                    disabled={isCalculating || !_businessName || !_businessAddress}
                     className={`w-full py-3 px-4 rounded-lg transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 ${
-                      isCalculating || !businessName || !businessAddress
+                      isCalculating || !_businessName || !_businessAddress
                         ? 'bg-gray-300 cursor-not-allowed'
                         : 'bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg'
                     } text-white font-medium`}
@@ -498,13 +498,13 @@ export default function Home() {
               <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
                 <h2 className="text-xl font-semibold mb-4">Social Media Presence</h2>
                 <div className="grid grid-cols-2 gap-4">
-                  {Object.entries(seoScore.socialMedia).map(([platform, data]) => (
+                  {Object.entries(seoScore.socialMedia).map(([platform]) => (
                     <div key={platform} className="p-4 bg-gray-50 rounded-lg">
                       <h3 className="font-medium mb-2 capitalize">{platform}</h3>
-                      {data.exists ? (
+                      {seoScore.socialMedia[platform]?.exists ? (
                         <>
                           <p className="text-green-600 font-medium">Active</p>
-                          <p className="text-sm text-gray-600">{data.followers} followers</p>
+                          <p className="text-sm text-gray-600">{seoScore.socialMedia[platform]?.followers} followers</p>
                         </>
                       ) : (
                         <p className="text-red-600 font-medium">Not Found</p>
@@ -583,7 +583,7 @@ export default function Home() {
                     <input
                       type="text"
                       id="businessName"
-                      value={businessName}
+                      value={_businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
                       className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-gray-900 placeholder-gray-400"
                       placeholder="Enter your business name"
@@ -620,7 +620,7 @@ export default function Home() {
                     </div>
                     <textarea
                       id="businessAddress"
-                      value={businessAddress}
+                      value={_businessAddress}
                       onChange={(e) => setBusinessAddress(e.target.value)}
                       className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-gray-900 placeholder-gray-400 resize-none"
                       placeholder="Enter your business address"
@@ -635,9 +635,9 @@ export default function Home() {
                 {/* Calculate Button */}
                 <button
                   onClick={calculateSeoScore}
-                  disabled={isCalculating || !businessName || !businessAddress}
+                  disabled={isCalculating || !_businessName || !_businessAddress}
                   className={`w-full py-3 px-4 rounded-lg transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 ${
-                    isCalculating || !businessName || !businessAddress
+                    isCalculating || !_businessName || !_businessAddress
                       ? 'bg-gray-300 cursor-not-allowed'
                       : 'bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg'
                   } text-white font-medium`}
