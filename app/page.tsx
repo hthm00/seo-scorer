@@ -38,8 +38,33 @@ interface Recommendation {
   priority: 'high' | 'medium' | 'low';
 }
 
+interface SocialMediaData {
+  exists: boolean;
+  followers: number;
+}
+
+interface SocialMediaPlatforms {
+  facebook: SocialMediaData;
+  instagram: SocialMediaData;
+  twitter: SocialMediaData;
+  linkedin: SocialMediaData;
+}
+
+interface ApiResponse {
+  searchRanking: {
+    googlePosition: number;
+    monthlySearches: number;
+    competitorRanks: number[];
+  };
+  socialMedia: SocialMediaPlatforms;
+  reviews: {
+    google: { rating: number; count: number };
+    yelp: { rating: number; count: number };
+  };
+}
+
 // Simulated API call - replace with actual SEO API integration
-const fetchSEOData = async (_businessName: string, _businessAddress: string) => {
+const fetchSEOData = async (businessName: string, businessAddress: string): Promise<ApiResponse> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -105,9 +130,10 @@ export default function Home() {
       score.googleRanking = Math.max(0, 100 - apiData.searchRanking.googlePosition);
 
       // Social media presence score
-      const socialPlatforms = ['facebook', 'instagram', 'twitter', 'linkedin'];
-      const existingPlatforms = socialPlatforms.filter(platform => 
-        apiData.socialMedia[platform]?.exists
+      const socialPlatforms = ['facebook', 'instagram', 'twitter', 'linkedin'] as const;
+      type SocialPlatform = typeof socialPlatforms[number];
+      const existingPlatforms = socialPlatforms.filter((platform: SocialPlatform) =>
+        apiData.socialMedia[platform].exists
       ).length;
       score.socialMediaPresence = (existingPlatforms / socialPlatforms.length) * 100;
 
@@ -498,13 +524,13 @@ export default function Home() {
               <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
                 <h2 className="text-xl font-semibold mb-4">Social Media Presence</h2>
                 <div className="grid grid-cols-2 gap-4">
-                  {Object.entries(seoScore.socialMedia).map(([platform]) => (
+                  {Object.entries(seoScore.socialMedia).map(([platform, data]: [SocialPlatform, SocialMediaData]) => (
                     <div key={platform} className="p-4 bg-gray-50 rounded-lg">
                       <h3 className="font-medium mb-2 capitalize">{platform}</h3>
-                      {seoScore.socialMedia[platform]?.exists ? (
+                      {data.exists ? (
                         <>
                           <p className="text-green-600 font-medium">Active</p>
-                          <p className="text-sm text-gray-600">{seoScore.socialMedia[platform]?.followers} followers</p>
+                          <p className="text-sm text-gray-600">{data.followers} followers</p>
                         </>
                       ) : (
                         <p className="text-red-600 font-medium">Not Found</p>
